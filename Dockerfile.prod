@@ -43,6 +43,8 @@ RUN addgroup -S user && adduser -S user -G user
 ENV HOME=/home/mysite
 ENV APP_HOME=/home/mysite/web
 RUN mkdir $APP_HOME
+RUN mkdir $APP_HOME/staticfiles
+RUN mkdir $APP_HOME/mediafiles
 WORKDIR $APP_HOME
 
 # install dependencies
@@ -52,12 +54,12 @@ COPY --from=builder /usr/src/mysite/requirements.txt .
 RUN pip install --no-cache /wheels/*
 
 # copy entrypoint.prod.sh
-COPY ./entrypoint.prod.sh /home/app/web/entrypoint.prod.sh
-RUN sed -i 's/\r$//g'  /home/app/web/entrypoint.prod.sh
-RUN chmod +x  /home/app/web/entrypoint.prod.sh
+COPY ./entrypoint.prod.sh .
+RUN sed -i 's/\r$//g'  $APP_HOME/entrypoint.prod.sh
+RUN chmod +x  $APP_HOME/entrypoint.prod.sh
 
 # copy project
-COPY ./mysite $APP_HOME
+COPY . $APP_HOME
 
 # chown all the files to the app user
 RUN chown -R user:user $APP_HOME
@@ -66,4 +68,4 @@ RUN chown -R user:user $APP_HOME
 USER user
 
 # run entrypoint.prod.sh
-ENTRYPOINT ["/home/app/web/entrypoint.prod.sh"]
+ENTRYPOINT ["/home/mysite/web/entrypoint.prod.sh"]

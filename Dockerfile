@@ -21,9 +21,9 @@ RUN pip install -r requirements.txt
 COPY ./mysite /usr/src/mysite
 
 # copy entrypoint.sh
-COPY ./mysite/entrypoint.sh /usr/src/app/entrypoint.sh
+COPY ./mysite/entrypoint.sh /usr/src/mysite/entrypoint.sh
 RUN sed -i 's/\r$//g' /usr/src/mysite/entrypoint.sh
 RUN chmod +x /usr/src/mysite/entrypoint.sh
 
 # run entrypoint.sh
-ENTRYPOINT ["/usr/src/mysite/entrypoint.sh"]
+ENTRYPOINT ["mysite/entrypoint.sh"]
