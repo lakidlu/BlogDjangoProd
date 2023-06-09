@@ -1,5 +1,7 @@
+import datetime
+
 from django.shortcuts import render, get_object_or_404
-from .models import Post, Comment
+from .models import Post, Comment, Summary, Connections, Exchanges
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.views.generic import ListView
 from .forms import EmailPostForm, CommentForm, SearchForm
@@ -7,6 +9,8 @@ from django.core.mail import send_mail
 from taggit.models import Tag
 from django.db.models import Count
 from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
+import requests
+import json
 
 
 def post_search(request):
@@ -125,8 +129,93 @@ def post_details(request, year, month, day, post):
                    'similar_posts': similar_posts})
 
 
-def charts_view(request):
+def production_view(request):
+    URL = "https://www.pse.pl/transmissionMapService"
+    page = requests.get(URL)
+
+    datas = json.loads(page.text)
+
+    current_data = Summary()
+    try:
+        if request.method == "GET" or request.method == "POST":
+            current_data.status = datas['status']
+            current_data.czas = datetime.datetime.now()
+            current_data.timestamp = datas['timestamp']
+            current_data.PV = datas['data']['podsumowanie']['PV']
+            current_data.cieplne = datas['data']['podsumowanie']['cieplne']
+            current_data.czestotliwosc = datas['data']['podsumowanie']['czestotliwosc']
+            current_data.generacja = datas['data']['podsumowanie']['generacja']
+            current_data.inne = datas['data']['podsumowanie']['inne']
+            current_data.wiatrowe = datas['data']['podsumowanie']['wiatrowe']
+            current_data.wodne = datas['data']['podsumowanie']['wodne']
+            current_data.zapotrzebowanie = datas['data']['podsumowanie']['zapotrzebowanie']
+    except:
+        pass
+
+
     return render(request,
-                  'blog/charts.html',
+                  'blog/production.html',
+                  {'current_data': current_data,
+                   }
                   )
 
+def exchange_view(request):
+    URL = "https://www.pse.pl/transmissionMapService"
+    page = requests.get(URL)
+    datas = json.loads(page.text)
+    connections_data_se = Connections()
+    connections_data_cz = Connections()
+    connections_data_de = Connections()
+    connections_data_sk = Connections()
+    connections_data_ua = Connections()
+    connections_data_lt = Connections()
+    exchanges_data = Exchanges()
+    eksport, importt = exchanges_calculation(datas)
+    saldo = eksport + importt
+
+    try:
+        if request.method == "GET" or request.method == "POST":
+            exchanges_data.timestamp = datas['timestamp']
+            exchanges_data.czas = datetime.datetime.now()
+            exchanges_data.eksport = abs(eksport)
+            exchanges_data.importt = importt
+            exchanges_data.saldo = saldo
+
+            connections_data_se.wartosc = datas['data']['przesyly'][0]['wartosc']
+            connections_data_se.wartosc_plan = datas['data']['przesyly'][0]['wartosc_plan']
+            connections_data_cz.wartosc = datas['data']['przesyly'][2]['wartosc']
+            connections_data_cz.wartosc_plan = datas['data']['przesyly'][2]['wartosc_plan']
+            connections_data_de.wartosc = datas['data']['przesyly'][1]['wartosc']
+            connections_data_de.wartosc_plan = datas['data']['przesyly'][1]['wartosc_plan']
+            connections_data_sk.wartosc = datas['data']['przesyly'][3]['wartosc']
+            connections_data_sk.wartosc_plan = datas['data']['przesyly'][3]['wartosc_plan']
+            connections_data_ua.wartosc = datas['data']['przesyly'][4]['wartosc']
+            connections_data_ua.wartosc_plan = datas['data']['przesyly'][4]['wartosc_plan']
+            connections_data_lt.wartosc = datas['data']['przesyly'][5]['wartosc']
+            connections_data_lt.wartosc_plan = datas['data']['przesyly'][5]['wartosc_plan']
+    except:
+        pass
+
+
+    return render(request,
+                  'blog/exchange.html',
+                  {'connections_data_se': connections_data_se,
+                   'connections_data_cz': connections_data_cz,
+                   'connections_data_de': connections_data_de,
+                   'connections_data_sk': connections_data_sk,
+                   'connections_data_ua': connections_data_ua,
+                   'connections_data_lt': connections_data_lt,
+                   'exchanges_data': exchanges_data,
+                   }
+                  )
+
+
+def exchanges_calculation(datas):
+    eksport, importt = 0, 0
+    for _ in datas['data']['przesyly']:
+        if _['wartosc'] > 0:
+            importt += _['wartosc']
+        elif _['wartosc'] <= 0:
+            eksport += _['wartosc']
+
+    return eksport, importt

@@ -18,5 +18,6 @@ urlpatterns = [
          views.post_list, name='post_list_by_tag'),
     path('feed/', LatestPostsFeed(), name='post_feed'),
     path('search/', views.post_search, name='post_search'),
-    path('charts/', views.charts_view, name='charts'),
+    path('production/', views.production_view, name='production'),
+    path('exchange/', views.exchange_view, name='exchange'),
 ]

@@ -1,9 +1,9 @@
 from django import forms
-from .models import Comment
+from .models import Comment, Summary
 
 
 class SearchForm(forms.Form):
-     query = forms. CharField()
+     query = forms.CharField()
 
 
 class EmailPostForm(forms.Form):

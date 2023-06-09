@@ -1,0 +1,25 @@
+{% extends "blog/base.html" %}
+{% load blog_tags %}
+
+{% block content %}
+    <h1>Zapotrzebowanie oraz produkcja energii</h1>
+    <ul class="b">
+        <li>Zapotrzebowanie na energię: {{ current_data.zapotrzebowanie }} [MW]</li>
+        <li>Całkowita produkcja energii: {{ current_data.generacja }} [MW]</li>
+        <li>Częstotliwość prądu: {{ current_data.czestotliwosc }} [Hz]</li>
+    </ul>
+    <ul class="b">
+        <li>PV: {{ current_data.PV }} [MW]</li>
+        <li>Wiatr: {{ current_data.wiatrowe }} [MW]</li>
+        <li>Woda: {{ current_data.wodne }} [MW]</li>
+        <li>Cieplne: {{ current_data.cieplne }} [MW]</li>
+        <li>Inne: {{ current_data.inne }} [MW]</li>
+    </ul>
+    <p class="date">
+        Odswiezony {{ current_data.czas }} dane pochodza z https://www.pse.pl/dane-systemowe
+    </p>
+    <form method="post">
+        {% csrf_token %}
+      <p><input type="submit" value="Odśwież dane"></p>
+    </form>
+{% endblock %}

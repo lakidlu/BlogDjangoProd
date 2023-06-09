@@ -5,6 +5,52 @@ from django.urls import reverse
 from taggit.managers import TaggableManager
 
 
+class Summary(models.Model):
+    timestamp = models.CharField(unique=True, max_length=255, null=False)
+    czas = models.DateTimeField(default=timezone.now(), null=False)
+    status = models.IntegerField(null=False)
+    wodne = models.IntegerField(null=False)
+    wiatrowe = models.IntegerField(null=False)
+    PV = models.IntegerField(null=False)
+    generacja = models.IntegerField(null=False)
+    zapotrzebowanie = models.IntegerField(null=False)
+    czestotliwosc = models.FloatField(null=False)
+    inne = models.IntegerField(null=False)
+    cieplne = models.IntegerField(null=False)
+
+    def __str__(self):
+        return self.timestamp
+
+
+class Connections(models.Model):
+    timestamp_id = models.CharField(unique=True, max_length=255, null=False)
+    timestamp = models.CharField(max_length=255, null=False)
+    czas = models.DateTimeField(default=timezone.now(), null=False)
+    status = models.IntegerField(null=False)
+    ID = models.CharField(max_length=5, null=False)
+    wartosc = models.IntegerField(null=False)
+    rownolegly = models.IntegerField(null=False)
+    wartosc_plan = models.IntegerField(null=False)
+
+    def __str__(self):
+        return self.timestamp
+
+    def __repr__(self):
+        return self.ID
+
+
+class Exchanges(models.Model):
+    timestamp = models.CharField(unique=True, max_length=255, null=False)
+    status = models.IntegerField(null=False)
+    czas = models.DateTimeField(default=timezone.now(), null=False)
+    eksport = models.IntegerField(null=False)
+    importt = models.IntegerField(null=False)
+    saldo = models.IntegerField(null=False)
+
+    def __str__(self):
+        return self.timestamp
+
+
 class PublishedManager(models.Manager):
     def get_queryset(self):
         return super(PublishedManager,

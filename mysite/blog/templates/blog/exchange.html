@@ -1,0 +1,42 @@
+{% extends "blog/base.html" %}
+{% load blog_tags %}
+
+{% block content %}
+    <h1>Wymiana handlowa z krajami sąsiadującymi</h1>
+    <ul>
+        <li class="b">Eksport: {{ exchanges_data.eksport }} [MW]</li>
+        <li class="b">Import: {{ exchanges_data.importt }} [MW]</li>
+        <li class="b">Saldo: {{ exchanges_data.saldo }} [MW]</li>
+    </ul>
+    <ul>
+        <li class="b">Czechy: {{ connections_data_cz.wartosc }} [MW]</li>
+        <li class="a">Plan: {{ connections_data_cz.wartosc_plan }} [MW]</li>
+    </ul>
+    <ul>
+        <li class="b">Słowacja: {{ connections_data_sk.wartosc }} [MW]</li>
+        <li class="a">Plan: {{ connections_data_sk.wartosc_plan }} [MW]</li>
+    </ul>
+    <ul>
+        <li class="b">Niemcy: {{ connections_data_de.wartosc }} [MW]</li>
+        <li class="a">Plan: {{ connections_data_de.wartosc_plan }} [MW]</li>
+    </ul>
+    <ul>
+        <li class="b">Litwa: {{ connections_data_lt.wartosc }} [MW]</li>
+        <li class="a">Plan: {{ connections_data_lt.wartosc_plan }} [MW]</li>
+    </ul>
+    <ul>
+        <li class="b">Ukraina: {{ connections_data_ua.wartosc }} [MW]</li>
+        <li class="a">Plan: {{ connections_data_ua.wartosc_plan }} [MW]</li>
+    </ul>
+    <ul>
+        <li class="b">Szwecja: {{ connections_data_se.wartosc }} [MW]</li>
+        <li class="a">Plan: {{ connections_data_se.wartosc_plan }} [MW]</li>
+    </ul>
+    <p class="date">
+        Odswiezony {{ exchanges_data.czas }} dane pochodza z https://www.pse.pl/dane-systemowe
+    </p>
+    <form method="post">
+        {% csrf_token %}
+      <p><input type="submit" value="Odśwież dane"></p>
+    </form>
+{% endblock %}
